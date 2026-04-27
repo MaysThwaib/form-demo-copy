@@ -5,6 +5,11 @@ void main() {
   runApp(const MyApp());
 }
 
+class Routes {
+  static const String form = '/';
+  static const String output = '/output';
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -12,10 +17,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Form Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyFormScreen(),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.blue),
+
+      // Named Routing
+      initialRoute: Routes.form,
+      routes: {
+        Routes.form: (context) => const MyFormScreen(),
+        Routes.output: (context) => const OutputScreen(),
+      },
     );
   }
 }
@@ -38,26 +48,33 @@ class _MyFormScreenState extends State<MyFormScreen> {
   double _age = 18;
   DateTime? _selectedDate;
 
-  final List<String> _countries = ['Palestine', 'Jordan', 'Eygpt', 'Syrya', 'Iraq'];
+  final List<String> _countries = [
+    'Palestine',
+    'Jordan',
+    'Egypt',
+    'Syria',
+    'Iraq',
+  ];
+
   final List<String> _genders = ['Male', 'Female'];
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      Navigator.push(
+
+      Navigator.pushNamed(
         context,
-        MaterialPageRoute(
-          builder: (context) => OutputScreen(
-            username: _username,
-            password: _password,
-            email: _email,
-            rememberMe: _rememberMe,
-            gender: _gender,
-            country: _country,
-            age: _age,
-            selectedDate: _selectedDate,
-          ),
-        ),
+        Routes.output,
+        arguments: {
+          'username': _username,
+          'password': _password,
+          'email': _email,
+          'rememberMe': _rememberMe,
+          'gender': _gender,
+          'country': _country,
+          'age': _age,
+          'selectedDate': _selectedDate,
+        },
       );
     }
   }
@@ -69,6 +86,7 @@ class _MyFormScreenState extends State<MyFormScreen> {
       firstDate: DateTime(1900),
       lastDate: DateTime(2050),
     );
+
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
@@ -79,9 +97,7 @@ class _MyFormScreenState extends State<MyFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter Form Demo'),
-      ),
+      appBar: AppBar(title: const Text('Flutter Form Demo')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -106,6 +122,7 @@ class _MyFormScreenState extends State<MyFormScreen> {
                 },
               ),
               const SizedBox(height: 16.0),
+
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Password',
@@ -127,6 +144,7 @@ class _MyFormScreenState extends State<MyFormScreen> {
                 },
               ),
               const SizedBox(height: 16.0),
+
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Email',
@@ -148,6 +166,7 @@ class _MyFormScreenState extends State<MyFormScreen> {
                 },
               ),
               const SizedBox(height: 16.0),
+
               CheckboxListTile(
                 title: const Text('Remember me'),
                 value: _rememberMe,
@@ -159,40 +178,45 @@ class _MyFormScreenState extends State<MyFormScreen> {
                 controlAffinity: ListTileControlAffinity.leading,
               ),
               const SizedBox(height: 16.0),
+
               Row(
                 children: <Widget>[
                   const Text('Gender:'),
                   const SizedBox(width: 10.0),
-                  ..._genders.map((gender) => Row(
-                        children: <Widget>[
-                          Radio<String>(
-                            value: gender.toLowerCase(),
-                            groupValue: _gender,
-                            onChanged: (String? value) {
-                              setState(() {
-                                _gender = value;
-                              });
-                            },
-                          ),
-                          Text(gender),
-                          const SizedBox(width: 10.0),
-                        ],
-                      )),
+                  ..._genders.map(
+                    (gender) => Row(
+                      children: <Widget>[
+                        Radio<String>(
+                          value: gender.toLowerCase(),
+                          groupValue: _gender,
+                          onChanged: (String? value) {
+                            setState(() {
+                              _gender = value;
+                            });
+                          },
+                        ),
+                        Text(gender),
+                        const SizedBox(width: 10.0),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16.0),
+
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
                   labelText: 'Country',
                   border: OutlineInputBorder(),
                 ),
                 value: _country,
-                items: _countries.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
+                items:
+                    _countries.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                 onChanged: (String? newValue) {
                   setState(() {
                     _country = newValue;
@@ -209,6 +233,7 @@ class _MyFormScreenState extends State<MyFormScreen> {
                 },
               ),
               const SizedBox(height: 16.0),
+
               Row(
                 children: <Widget>[
                   const Text('Age: '),
@@ -230,6 +255,7 @@ class _MyFormScreenState extends State<MyFormScreen> {
                 ],
               ),
               const SizedBox(height: 16.0),
+
               InkWell(
                 onTap: () => _selectDate(context),
                 child: InputDecorator(
@@ -251,6 +277,7 @@ class _MyFormScreenState extends State<MyFormScreen> {
                 ),
               ),
               const SizedBox(height: 24.0),
+
               ElevatedButton(
                 onPressed: _submitForm,
                 child: const Text('Submit'),
@@ -262,4 +289,3 @@ class _MyFormScreenState extends State<MyFormScreen> {
     );
   }
 }
-
